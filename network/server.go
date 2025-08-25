@@ -35,7 +35,7 @@ Free:
 		case <-s.quitCh:
 			break Free
 		case <-ticker.C:
-			fmt.Println("do stuf every x second")
+			fmt.Println("do stuff every x seconds")
 		}
 
 	}
