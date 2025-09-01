@@ -7,8 +7,8 @@ import (
 )
 
 func TestConnect(t *testing.T) {
-	tra := NewLocalTransport("A")
-	trb := NewLocalTransport("B")
+	tra := NewLocalTransport("A").(*LocalTransport)
+	trb := NewLocalTransport("B").(*LocalTransport)
 
 	tra.Connect(trb)
 	trb.Connect(tra)
@@ -26,11 +26,11 @@ func TestSendMessage(t *testing.T) {
 
 	msg := []byte("Hello B")
 
-	tra.SendMessage(trb.Addr(), msg)
+	tra.SendMessage(trb.Address(), msg)
 
 	rpc := <-trb.Consume()
 
 	assert.Equal(t, msg, rpc.Payload)
-	assert.Equal(t, tra.Addr(), rpc.From)
+	assert.Equal(t, tra.Address(), rpc.From)
 
 }

@@ -6,50 +6,50 @@ import (
 )
 
 type LocalTransport struct {
-	addr      NetAddr
+	addr      NetAddress
 	consumeCh chan RPC
+	peers     map[NetAddress]*LocalTransport
 	lock      sync.RWMutex
-	peers     map[NetAddr]*LocalTransport
 }
 
-func NewLocalTransport(addr NetAddr) Transport {
+func NewLocalTransport(addr NetAddress) Transport {
 	return &LocalTransport{
 		addr:      addr,
 		consumeCh: make(chan RPC, 1024),
-		peers:     make(map[NetAddr]*LocalTransport),
+		peers:     make(map[NetAddress]*LocalTransport),
 	}
 }
 
-func (lt *LocalTransport) Consume() <-chan RPC {
-	return lt.consumeCh
+func (ltra *LocalTransport) Consume() <-chan RPC {
+	return ltra.consumeCh
 }
 
-func (lt *LocalTransport) Connect(tra Transport) error {
-	lt.lock.Lock()
-	defer lt.lock.Unlock()
+func (ltra *LocalTransport) Connect(tra Transport) error {
+	ltra.lock.Lock()
+	defer ltra.lock.Unlock()
 
-	lt.peers[tra.Addr()] = tra.(*LocalTransport)
+	ltra.peers[tra.Address()] = tra.(*LocalTransport)
 
 	return nil
 }
 
-func (lt *LocalTransport) SendMessage(to NetAddr, payload []byte) error {
-	lt.lock.RLock()
-	defer lt.lock.RUnlock()
+func (ltra *LocalTransport) SendMessage(to NetAddress, msg []byte) error {
+	ltra.lock.RLock()
+	defer ltra.lock.RUnlock()
 
-	peer, ok := lt.peers[to]
+	peer, ok := ltra.peers[to]
 	if !ok {
-		return fmt.Errorf("%s: Could not send message to %s", lt.addr, to)
+		return fmt.Errorf("%s: Could not send message to %s", ltra.addr, to)
 	}
 
 	peer.consumeCh <- RPC{
-		From:    lt.addr,
-		Payload: payload,
+		From:    ltra.addr,
+		Payload: msg,
 	}
 
 	return nil
 }
 
-func (lt *LocalTransport) Addr() NetAddr {
-	return lt.addr
+func (ltra *LocalTransport) Address() NetAddress {
+	return ltra.addr
 }

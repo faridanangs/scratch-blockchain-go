@@ -14,7 +14,7 @@ func main() {
 
 	go func() {
 		for {
-			RemoteTra.SendMessage(LocalTra.Addr(), []byte("Hello Local Address"))
+			RemoteTra.SendMessage(LocalTra.Address(), []byte("Hello Local Address"))
 			time.Sleep(1 * time.Second)
 		}
 	}()
