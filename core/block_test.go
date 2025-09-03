@@ -1,64 +1,52 @@
 package core
 
 import (
-	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/faridanangs/projectx/crypto"
 	"github.com/faridanangs/projectx/types"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHeader_Encode_Decode(t *testing.T) {
+func randomBlock(height uint32) *Block {
 	h := &Header{
-		Version:   1,
-		PrevBlock: types.RandomHash(),
-		Timestamp: time.Now().UnixNano(),
-		Height:    10,
-		Nonce:     123456,
+		Version:       1,
+		PrevBlockHash: types.RandomHash(),
+		Timestamp:     time.Now().UnixNano(),
+		Height:        height,
 	}
 
-	buf := &bytes.Buffer{}
-	assert.Nil(t, h.EncodeBinary(buf))
-
-	hDecode := &Header{}
-	hDecode.DecodeBinary(buf)
-	assert.Equal(t, hDecode, h)
-
-}
-
-func TestBlock_Encode_Decode(t *testing.T) {
-	b := &Block{
-		Header: Header{
-			Version:   1,
-			PrevBlock: types.RandomHash(),
-			Timestamp: time.Now().UnixNano(),
-			Height:    10,
-			Nonce:     123456,
-		},
-		Transactions: nil,
+	tx := Transaction{
+		Data: []byte("foo"),
 	}
 
-	buf := &bytes.Buffer{}
-	assert.Nil(t, b.EncodeBinary(buf))
-
-	bDecode := &Block{}
-	bDecode.DecodeBinary(buf)
-	assert.Equal(t, bDecode, b)
+	return NewBlock(h, []Transaction{tx})
 
 }
-
 func TestBlock_Hash(t *testing.T) {
-	b := &Block{
-		Header: Header{
-			Version:   1,
-			PrevBlock: types.RandomHash(),
-			Timestamp: time.Now().UnixNano(),
-			Height:    10,
-			Nonce:     123456,
-		},
-		Transactions: []Transaction{},
-	}
-	h := b.Hash()
-	assert.False(t, h.IsZero())
+	b := randomBlock(9)
+
+	fmt.Println(b.Hash(BlockHasher{}))
+}
+
+func TestBlockSign(t *testing.T) {
+	privkey := crypto.GeneratePrivateKey()
+	b := randomBlock(10)
+
+	assert.Nil(t, b.Sign(privkey))
+}
+
+func TestBlockVerify(t *testing.T) {
+	privkey := crypto.GeneratePrivateKey()
+	b := randomBlock(10)
+
+	assert.Nil(t, b.Sign(privkey))
+	assert.Nil(t, b.Verify())
+
+	otherPrivkey := crypto.GeneratePrivateKey()
+
+	b.Validator = otherPrivkey.PublicKey()
+	assert.NotNil(t, b.Verify())
 }

@@ -16,7 +16,7 @@ func TestKeypair(t *testing.T) {
 	sign, err := privkey.Sign(msg)
 	assert.Nil(t, err)
 
-	b := sign.Verify(pubkey.key, msg, sign.r, sign.s)
+	b := sign.Verify(pubkey, msg)
 	assert.True(t, b)
 
 	fmt.Println(address)

@@ -62,6 +62,6 @@ func (k *PublicKey) Address() types.Address {
 
 type Signature struct{ r, s *big.Int }
 
-func (sign Signature) Verify(pubkey *ecdsa.PublicKey, data []byte, r *big.Int, s *big.Int) bool {
-	return ecdsa.Verify(pubkey, data, r, s)
+func (sig Signature) Verify(pubkey PublicKey, data []byte) bool {
+	return ecdsa.Verify(pubkey.key, data, sig.r, sig.s)
 }
