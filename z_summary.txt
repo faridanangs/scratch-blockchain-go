@@ -1,3 +1,49 @@
-eps 1.
+// Mengulang apa yang sudah saya pelajari
 
-saya telah belajar bagaimana cara membuat transport layer di blockchain
+#(Folder)
+%(File)
+$(Function)
+...(isi sendiri cok)
+
+
+#crypto:
+  %keypair.go:
+    $GeneratePrivateKey() PrivateKey
+    $PublicKey() PublicKey
+    $Sign(data []byte) (*Signature, error)
+    $ToSLice() []byte
+    $Addres() string
+    $Verify(pubkey PublicKey, data []byte) bool
+
+#core:
+  %block.go:
+    $NewBlock(h *Header, txx []Transaction) *Block
+    $Sign(privkey PrivateKey) error
+    $Verify() error
+    $Encode(w io.Writer, enc ...) error
+    $Decode(r io.Reader, dec ...) error
+    $Hash(hasher ...) hash
+    $HeaderData() []byte
+  
+  %transaction.go:
+    $Sign(privkey PrivateKey) error
+    $Verify(PublicKey, data) error
+
+  %hasher.go:
+    $Hash(b *Block)
+
+  %encoding.go:
+    ...
+#types:
+  %address.go:
+    $ToSLice() []byte
+    $String() string
+    $NewAddressFromBytes(b []byte) Address
+
+  %hahs.go:
+    $HashFromBytes(b []byte) Hash
+    $RandomBytes(size int) []byte
+    $RandomHash() Hash
+    $ToSlice() []byte
+    $String()string
+    $NewAddressFromBytes(b []byte) Address 
